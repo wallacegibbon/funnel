@@ -29,7 +29,7 @@ class Funnel {
           task.res(r)
         }
       } catch (e) {
-        task.rej(new FunnelError(e))
+        task.rej(e)
       }
     }
     this.running = false
@@ -44,13 +44,5 @@ class Funnel {
   }
 }
 
-
-class FunnelError extends Error {
-  constructor(msg) {
-    super()
-    this.message = msg instanceof Error ? msg.message : msg
-    this.name = 'FunnelError'
-  }
-}
 
 module.exports = Funnel
