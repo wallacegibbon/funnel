@@ -1,0 +1,17 @@
+{
+  "name": "@moontoad/funnel",
+  "version": "0.1.0",
+  "description": "A library to help solve racing problem.",
+  "author": {
+    "name": "Wallace Gibbon",
+    "email": "wallacegibbon@outlook.com"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/wallacegibbon/funnel.git"
+  },
+  "engines": {
+    "node": ">=8.0.0"
+  },
+  "license": "MIT"
+}
