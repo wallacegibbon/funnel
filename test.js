@@ -2,6 +2,8 @@ const Funnel = require('./')
 
 const funnel = new Funnel()
 
+funnel.on('size', size => console.log('-----------------------> current queue size:', size))
+
 async function task(group, name, x, y, z)
 {
 	await sleep(1000)

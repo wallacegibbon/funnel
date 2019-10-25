@@ -1,4 +1,6 @@
-class Funnel
+const EventEmitter = require('events')
+
+class Funnel extends EventEmitter
 {
 	/**
 	 * Create a funnel object, then use the funnel to wrap the functions you want to
@@ -6,6 +8,7 @@ class Funnel
 	 */
 	constructor()
 	{
+		super()
 		this.taskQueue = []
 		this.running = false
 	}
@@ -22,6 +25,7 @@ class Funnel
 				(res, rej) =>
 				{
 					this.taskQueue.push({ fn, args, res, rej })
+					this.emit('size', this.taskQueue.length)
 					if (!this.running)
 					{
 						this.running = true
@@ -33,32 +37,43 @@ class Funnel
 	}
 
 	/**
-	 * run the tasks in this.taskQueue, and return the result to its caller.
+	 * run all the tasks in the task queue.
 	 */
 	async run()
 	{
-		let task = this.taskQueue.shift()
-		while (task)
-		{
-			try
-			{
-				const r = task.fn(...task.args)
-				if (r.constructor === Promise)
-				{
-					task.res(await r)
-				}
-				else
-				{
-					task.res(r)
-				}
-			}
-			catch (e)
-			{
-				task.rej(e)
-			}
-			task = this.taskQueue.shift()
-		}
+		while (await this.next())
+		{}
 		this.running = false
+	}
+
+	/**
+	 * run the next task in this.taskQueue, and return the result to its caller.
+	 */
+	async next()
+	{
+		const task = this.taskQueue.shift()
+		if (!task)
+		{
+			return false
+		}
+		this.emit('size', this.taskQueue.length)
+		try
+		{
+			const r = task.fn(...task.args)
+			if (r.constructor === Promise)
+			{
+				task.res(await r)
+			}
+			else
+			{
+				task.res(r)
+			}
+		}
+		catch (e)
+		{
+			task.rej(e)
+		}
+		return true
 	}
 }
 
