@@ -19,9 +19,9 @@ class Funnel extends EventEmitter
 	 */
 	wrap(fn)
 	{
-		return (...args) =>
-		{
-			return new Promise(
+		return (
+			(...args) =>
+			new Promise(
 				(res, rej) =>
 				{
 					this.taskQueue.push({ fn, args, res, rej })
@@ -33,7 +33,7 @@ class Funnel extends EventEmitter
 					}
 				}
 			)
-		}
+		)
 	}
 
 	/**
@@ -41,22 +41,24 @@ class Funnel extends EventEmitter
 	 */
 	async run()
 	{
-		while (await this.next())
-		{}
-		this.running = false
+		while (true)
+		{
+			const task = this.taskQueue.shift()
+			this.emit('size', this.taskQueue.length)
+			if (!task)
+			{
+				this.running = false
+				return
+			}
+			await this.exec(task)
+		}
 	}
 
 	/**
-	 * run the next task in this.taskQueue, and return the result to its caller.
+	 * execute the task and return the calculated result
 	 */
-	async next()
+	async exec(task)
 	{
-		const task = this.taskQueue.shift()
-		if (!task)
-		{
-			return false
-		}
-		this.emit('size', this.taskQueue.length)
 		try
 		{
 			task.res(await task.fn(...task.args))
@@ -65,7 +67,6 @@ class Funnel extends EventEmitter
 		{
 			task.rej(e)
 		}
-		return true
 	}
 }
 
