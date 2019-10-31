@@ -59,15 +59,7 @@ class Funnel extends EventEmitter
 		this.emit('size', this.taskQueue.length)
 		try
 		{
-			const r = task.fn(...task.args)
-			if (r.constructor === Promise)
-			{
-				task.res(await r)
-			}
-			else
-			{
-				task.res(r)
-			}
+			task.res(await task.fn(...task.args))
 		}
 		catch (e)
 		{
