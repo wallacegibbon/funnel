@@ -1,6 +1,6 @@
 {
 	"name": "@moontoad/funnel",
-	"version": "0.2.2",
+	"version": "0.3.0",
 	"description": "A library to help solve racing problem.",
 	"author": {
 		"name": "Wallace Gibbon",

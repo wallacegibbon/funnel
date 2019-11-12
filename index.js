@@ -6,11 +6,13 @@ class Funnel extends EventEmitter
 	 * Create a funnel object, then use the funnel to wrap the functions you want to
 	 * execute in sequence.
 	 */
-	constructor()
+	constructor(maxQueueSize)
 	{
 		super()
+		this.maxQueueSize
 		this.taskQueue = []
 		this.running = false
+		this.maxQueueSize = maxQueueSize
 	}
 
 	/**
@@ -24,12 +26,20 @@ class Funnel extends EventEmitter
 			new Promise(
 				(res, rej) =>
 				{
-					this.taskQueue.push({ fn, args, res, rej })
-					this.emit('size', this.taskQueue.length)
-					if (!this.running)
+					if (!this.maxQueueSize ||
+						(this.taskQueue.length < this.maxQueueSize))
 					{
-						this.running = true
-						this.run()
+						this.taskQueue.push({ fn, args, res, rej })
+						this.emit('size', this.taskQueue.length)
+						if (!this.running)
+						{
+							this.running = true
+							this.run()
+						}
+					}
+					else
+					{
+						rej(new Error(`funnel reached max size ${this.maxQueueSize}`))
 					}
 				}
 			)
